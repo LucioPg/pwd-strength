@@ -103,7 +103,7 @@ pub fn init_blacklist_from_path<P: AsRef<std::path::Path>>(path: P) -> Result<us
 
     if content.trim().is_empty() {
         #[cfg(feature = "tracing")]
-        tracing::error!("Blacklist initialization FAILED: Empty file {}", path);
+        tracing::error!("Blacklist initialization FAILED: Empty file {:?}", path);
         return Err(BlacklistError::EmptyFile);
     }
 

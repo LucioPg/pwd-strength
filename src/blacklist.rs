@@ -95,7 +95,7 @@ pub fn init_blacklist_from_path<P: AsRef<std::path::Path>>(path: P) -> Result<us
 
     if !path.exists() {
         #[cfg(feature = "tracing")]
-        tracing::error!("Blacklist initialization FAILED: FileNotFound {}", path);
+        tracing::error!("Blacklist initialization FAILED: FileNotFound {:?}", path);
         return Err(BlacklistError::FileNotFound(path.to_path_buf()));
     }
 

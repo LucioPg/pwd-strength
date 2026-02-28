@@ -1,0 +1,36 @@
+[package]
+name = "pwd-strength"
+version = "0.1.0"
+edition = "2024"
+description = "Password strength evaluation with blacklist support"
+license = "MIT"
+repository = "https://github.com/LucioPg/pwd-strength"
+readme = "README.md"
+keywords = ["password", "strength", "security", "evaluation", "blacklist"]
+categories = ["authentication"]
+
+[features]
+default = ["async"]
+
+# Async support (incluso di default)
+async = ["dep:tokio", "dep:tokio-util"]
+
+# Tracing support
+tracing = ["dep:tracing"]
+
+[dependencies]
+pwd-types = { git = "https://github.com/LucioPg/pwd-types", features = ["secrecy"] }
+thiserror = "2.0"
+secrecy = "0.10"
+
+# Async (optional)
+tokio = { version = "1", features = ["sync", "time", "rt"], optional = true }
+tokio-util = { version = "0.7", optional = true }
+
+# Logging (optional)
+tracing = { version = "0.1", optional = true }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["test-util", "macros", "sync", "time", "rt"] }
+tempfile = "3"
+serial_test = "3"

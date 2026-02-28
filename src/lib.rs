@@ -11,7 +11,7 @@
 //! # Environment Variables
 //!
 //! - `PWD_BLACKLIST_PATH`: Custom path to blacklist file
-//!   (default: `./assets/10k-most-common.txt`)
+//!   (default: `./assets/blacklist.txt`)
 //!
 //! # Example
 //!
@@ -44,7 +44,7 @@ mod evaluator;
 mod sections;
 
 // Public API
-pub use blacklist::{init_blacklist, get_blacklist, is_blacklisted, BlacklistError};
+pub use blacklist::{init_blacklist, init_blacklist_from_path, get_blacklist, is_blacklisted, BlacklistError};
 pub use evaluator::evaluate_password_strength;
 
 #[cfg(feature = "async")]

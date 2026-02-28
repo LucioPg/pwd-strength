@@ -140,9 +140,9 @@ pub async fn evaluate_password_strength_tx(
     tokio::time::sleep(Duration::from_millis(300)).await;
     let evaluation = evaluate_password_strength(password, Some(token));
 
-    if let Err(e) = tx.send(evaluation).await {
+    if let Err(_e) = tx.send(evaluation).await {
         #[cfg(feature = "tracing")]
-        tracing::error!("Failed to send password evaluation result: {}", e);
+        tracing::error!("Failed to send password evaluation result: {}", _e);
     }
 }
 

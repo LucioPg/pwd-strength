@@ -23,11 +23,11 @@ pub enum BlacklistError {
 ///
 /// Priority:
 /// 1. Environment variable `PWD_BLACKLIST_PATH`
-/// 2. Default path `./assets/10k-most-common.txt`
+/// 2. Default path `./assets/blacklist.txt`
 pub fn get_blacklist_path() -> PathBuf {
     std::env::var("PWD_BLACKLIST_PATH")
         .map(PathBuf::from)
-        .unwrap_or_else(|_| PathBuf::from("./assets/10k-most-common.txt"))
+        .unwrap_or_else(|_| PathBuf::from("./assets/blacklist.txt"))
 }
 
 /// Initializes the password blacklist from external file.
@@ -35,7 +35,7 @@ pub fn get_blacklist_path() -> PathBuf {
 /// # Environment Variable
 ///
 /// Set `PWD_BLACKLIST_PATH` to specify a custom blacklist file location.
-/// If not set, defaults to `./assets/10k-most-common.txt`.
+/// If not set, defaults to `./assets/blacklist.txt`.
 ///
 /// # Errors
 ///
@@ -55,6 +55,34 @@ pub fn get_blacklist_path() -> PathBuf {
 /// pwd_strength::init_blacklist()?;
 /// ```
 pub fn init_blacklist() -> Result<usize, BlacklistError> {
+    let path = get_blacklist_path();
+    init_blacklist_from_path(&path)
+}
+
+/// Initializes the password blacklist from a specific file path.
+///
+/// Use this when you need to pass the path directly (e.g., from Dioxus asset system)
+/// instead of relying on environment variables.
+///
+/// # Arguments
+///
+/// * `path` - Path to the blacklist file
+///
+/// # Errors
+///
+/// Returns error if:
+/// - File does not exist
+/// - File cannot be read
+/// - File is empty
+///
+/// # Example
+///
+/// ```rust,ignore
+/// // Use with Dioxus asset system
+/// let asset_path = BLACKLIST_ASSET.to_string();
+/// pwd_strength::init_blacklist_from_path(&asset_path)?;
+/// ```
+pub fn init_blacklist_from_path<P: AsRef<std::path::Path>>(path: P) -> Result<usize, BlacklistError> {
     // Idempotente: se gia inizializzata, ritorna subito
     {
         let guard = COMMON_PASSWORDS.read().unwrap();
@@ -63,10 +91,10 @@ pub fn init_blacklist() -> Result<usize, BlacklistError> {
         }
     }
 
-    let path = get_blacklist_path();
+    let path = path.as_ref();
 
     if !path.exists() {
-        return Err(BlacklistError::FileNotFound(path));
+        return Err(BlacklistError::FileNotFound(path.to_path_buf()));
     }
 
     let content = std::fs::read_to_string(&path)?;
@@ -146,7 +174,7 @@ mod tests {
         remove_env("PWD_BLACKLIST_PATH");
 
         let path = get_blacklist_path();
-        assert_eq!(path, PathBuf::from("./assets/10k-most-common.txt"));
+        assert_eq!(path, PathBuf::from("./assets/blacklist.txt"));
     }
 
     #[test]

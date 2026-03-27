@@ -13,6 +13,8 @@ use crate::sections::{
     blacklist_section, character_variety_section, length_section, pattern_analysis_section,
 };
 
+type EvaluatorSections<'a> = Vec<(&'a str, fn(&SecretString) -> Result<Option<String>, ()>)>;
+
 /// Evaluates password strength and returns a detailed evaluation.
 ///
 /// # Arguments
@@ -33,23 +35,23 @@ pub fn evaluate_password_strength(
     let pwd_len = pwd.len();
 
     // Orchestrator: execute sections in sequence
-    let sections: Vec<(&str, fn(&SecretString) -> Result<Option<String>, ()>)> = vec![
+    let sections: EvaluatorSections = vec![
         ("blacklist", blacklist_section),
         ("length", length_section),
         ("variety", character_variety_section),
         ("pattern", pattern_analysis_section),
     ];
 
-    for (section_name, section_fn) in sections {
+    for (_, section_fn) in sections {
         // Check cancellation before each section (async only)
         #[cfg(feature = "async")]
         {
-            if let Some(ref t) = token {
-                if t.is_cancelled() {
+            if let Some(ref t) = token
+                && t.is_cancelled() {
                     reasons.push("Evaluation cancelled".to_string());
                     is_cancelled = true;
                     break;
-                }
+
             }
         }
 
@@ -120,7 +122,7 @@ pub fn evaluate_password_strength(
     }
 
     PasswordEvaluation {
-        score: score.map(|s| PasswordScore::new(s)),
+        score: score.map(PasswordScore::new),
         reasons,
     }
 }

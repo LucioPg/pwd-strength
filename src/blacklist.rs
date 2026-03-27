@@ -99,7 +99,7 @@ pub fn init_blacklist_from_path<P: AsRef<std::path::Path>>(path: P) -> Result<us
         return Err(BlacklistError::FileNotFound(path.to_path_buf()));
     }
 
-    let content = std::fs::read_to_string(&path)?;
+    let content = std::fs::read_to_string(path)?;
 
     if content.trim().is_empty() {
         #[cfg(feature = "tracing")]

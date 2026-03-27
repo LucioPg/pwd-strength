@@ -42,7 +42,7 @@ pub fn evaluate_password_strength(
         ("pattern", pattern_analysis_section),
     ];
 
-    for (_, section_fn) in sections {
+    for (_section_name, section_fn) in sections {
         // Check cancellation before each section (async only)
         #[cfg(feature = "async")]
         {
@@ -64,7 +64,7 @@ pub fn evaluate_password_strength(
             }
             Err(()) => {
                 #[cfg(feature = "tracing")]
-                tracing::error!("Fatal error in password evaluation section: {}", section_name);
+                tracing::error!("Fatal error in password evaluation section: {}", _section_name);
                 reasons.push("Error".to_string());
                 score = None;
                 break;
